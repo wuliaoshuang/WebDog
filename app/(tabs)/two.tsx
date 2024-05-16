@@ -1,14 +1,33 @@
-import { StyleSheet } from 'react-native';
+import React from 'react';
+import { Button, StyleSheet, View } from 'react-native';
+import Animated, {
+  LightSpeedInLeft,
+  LightSpeedOutLeft,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSpring
+} from 'react-native-reanimated';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+export default function AnimatedStyleUpdateExample() {
 
-export default function TabTwoScreen() {
+  const INITIAL_OFFSET = 10;
+
+  const offset = useSharedValue<number>(-10);
+
+  const animatedStyles = useAnimatedStyle(() => ({
+    transform: [{ translateY: offset.value }],
+  }));
+  offset.value = withRepeat(withSpring(-offset.value), 1, true);
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/two.tsx" />
+      <Animated.View entering={LightSpeedInLeft} exiting={LightSpeedOutLeft} style={[styles.box]} />
+      <Button
+        title="toggle"
+        onPress={() => {
+          offset.value = Math.random() * 350;
+        }}
+      />
     </View>
   );
 }
@@ -19,13 +38,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  box: {
+    width: 100,
+    height: 80,
+    backgroundColor: 'black',
+    margin: 30,
   },
 });
